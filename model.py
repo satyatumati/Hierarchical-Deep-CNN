@@ -300,44 +300,36 @@ print(fine_categories)
 #single classifier training (shared)
 in_layer = Input(shape=input_shape, dtype='float32', name='main_input')
 
-net = Conv2D(384, 3, strides=1, padding='same', activation='elu')(in_layer)
+net = Conv2D(184, 3, strides=1, padding='same', activation='elu')(in_layer)
 net = MaxPooling2D((2, 2), padding='valid')(net)
 
-net = Conv2D(384, 1, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(384, 2, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(640, 2, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(640, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(184, 1, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(184, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(284, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(284, 2, strides=1, padding='same', activation='elu')(net)
 net = Dropout(.2)(net)
 net = MaxPooling2D((2, 2), padding='valid')(net)
 
-net = Conv2D(640, 1, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(768, 2, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(768, 2, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(768, 2, strides=1, padding='same', activation='elu')(net)
-net = Dropout(.3)(net)
-net = MaxPooling2D((2, 2), padding='valid')(net)
-
-net = Conv2D(768, 1, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(896, 2, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(896, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(284, 1, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(440, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(440, 2, strides=1, padding='same', activation='elu')(net)
 net = Dropout(.4)(net)
 net = MaxPooling2D((2, 2), padding='valid')(net)
 
-net = Conv2D(896, 3, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(1024, 2, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(1024, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(440, 3, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(568, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(568, 2, strides=1, padding='same', activation='elu')(net)
 net = Dropout(.5)(net)
 net = MaxPooling2D((2, 2), padding='valid')(net)
 
-net = Conv2D(1024, 1, strides=1, padding='same', activation='elu')(net)
-net = Conv2D(1152, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(568, 1, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(606, 2, strides=1, padding='same', activation='elu')(net)
 net = Dropout(.6)(net)
 net = MaxPooling2D((2, 2), padding='same')(net)
 
 net = Flatten()(net)
-net = Dense(1152, activation='elu')(net)
+net = Dense(606, activation='elu')(net)
 net = Dense(fine_categories, activation='softmax')(net)
-
 
 # In[124]:
 
@@ -391,13 +383,13 @@ for i in range(len(model.layers)):
 
 
 #fine-tuning for coarse classifier
-net = Conv2D(1024, 1, strides=1, padding='same', activation='elu')(model.layers[-8].output)
-net = Conv2D(1152, 2, strides=1, padding='same', activation='elu')(net)
+net = Conv2D(568, 1, strides=1, padding='same', activation='elu')(model.layers[-8].output)
+net = Conv2D(606, 2, strides=1, padding='same', activation='elu')(net)
 net = Dropout(.6)(net)
 net = MaxPooling2D((2, 2), padding='same')(net)
 
 net = Flatten()(net)
-net = Dense(1152, activation='elu')(net)
+net = Dense(606, activation='elu')(net)
 out_coarse = Dense(coarse_categories, activation='softmax')(net)
 
 model_c = Model(inputs=in_layer,outputs=out_coarse)
@@ -505,13 +497,13 @@ while index < stop:
 
 #constructing fine classifiers
 def fine_model():
-    net = Conv2D(1024, 1, strides=1, padding='same', activation='elu')(model.layers[-8].output)
-    net = Conv2D(1152, 2, strides=1, padding='same', activation='elu')(net)
+    net = Conv2D(568, 1, strides=1, padding='same', activation='elu')(model.layers[-8].output)
+    net = Conv2D(606, 2, strides=1, padding='same', activation='elu')(net)
     net = Dropout(.6)(net)
     net = MaxPooling2D((2, 2), padding='same')(net)
 
     net = Flatten()(net)
-    net = Dense(1152, activation='elu')(net)
+    net = Dense(606, activation='elu')(net)
     out_fine = Dense(fine_categories, activation='softmax')(net)
     model_fine = Model(inputs=in_layer,outputs=out_fine)
     model_fine.compile(optimizer= sgd_coarse,
