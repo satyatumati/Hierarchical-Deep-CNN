@@ -11,6 +11,7 @@ from keras.models import Model, Sequential
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from keras.utils import to_categorical
 from keras import optimizers
+import matplotlib.pylab as plt
 import scipy.linalg
 from sklearn.cluster import k_means
 from sklearn.cluster import *
@@ -19,7 +20,9 @@ from sklearn import preprocessing
 import csv
 import numpy as np
 import pandas as pd
+from imutils import paths
 import random
+import cv2
 import os
 import copy
 
@@ -157,7 +160,6 @@ conf_mat = np.zeros((num_classes,num_classes))
 Hardcoding 100-class probabilities for validation images .
 '''
 #class_prob = [14/59,16/59,5/59,14/59,10/59]
-
 class_prob = [1.0/num_classes]*num_classes
 val_prob = np.zeros((num_values,num_classes))
 
@@ -191,6 +193,7 @@ for i in range(num_classes):
 
 
 print(conf_mat)
+plt.imshow(conf_mat)
 
 
 # In[116]:
@@ -200,6 +203,9 @@ dist_mat = 1 - conf_mat
 '''set diagonal elements to 0'''
 dist_mat[range(num_classes),range(num_classes)]=0
 dist_mat = 0.5 * (dist_mat + dist_mat.T)
+plt.figure()
+plt.title('distance matrix on validation set')
+plt.imshow(dist_mat)
 
 
 # In[117]:
@@ -224,6 +230,7 @@ eig_val,eig_vec=scipy.linalg.eig(L,D)
 ftr=eig_vec[:,1:dim+1]
 print(eig_vec[:,0]) # the 1st eigenvector should be all ones
 eigval_cumsum = np.cumsum(np.real(eig_val))
+plt.plot(eigval_cumsum)
 
 
 # In[118]:
@@ -426,14 +433,13 @@ for c in range(coarse_categories):
 for key in traindict:
     val = traindict[key]
     c = f2cmap[val]
-
-    os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
-
+    os.system('cp '+ trainsrc+"/"+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
+    
 for key in valdict:
     val = valdict[key]
     c = f2cmap[val]
-
-    os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+    os.system('cp '+ valsrc+"/"+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+        
 
 
 # In[152]:

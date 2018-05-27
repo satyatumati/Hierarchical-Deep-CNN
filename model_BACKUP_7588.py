@@ -157,8 +157,11 @@ conf_mat = np.zeros((num_classes,num_classes))
 Hardcoding 100-class probabilities for validation images .
 '''
 #class_prob = [14/59,16/59,5/59,14/59,10/59]
-
+<<<<<<< HEAD
 class_prob = [1.0/num_classes]*num_classes
+=======
+class_prob = [1.0/num_classe]*num_classes
+>>>>>>> be307526065799a4d37399470582eff55a205374
 val_prob = np.zeros((num_values,num_classes))
 
 for i in range(num_values):
@@ -426,14 +429,21 @@ for c in range(coarse_categories):
 for key in traindict:
     val = traindict[key]
     c = f2cmap[val]
-
+<<<<<<< HEAD
+    os.system('cp '+ trainsrc+"/"+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
+=======
     os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
-
+>>>>>>> be307526065799a4d37399470582eff55a205374
+    
 for key in valdict:
     val = valdict[key]
     c = f2cmap[val]
-
+<<<<<<< HEAD
+    os.system('cp '+ valsrc+"/"+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+=======
     os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+>>>>>>> be307526065799a4d37399470582eff55a205374
+        
 
 
 # In[152]:

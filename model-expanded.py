@@ -11,6 +11,7 @@ from keras.models import Model, Sequential
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from keras.utils import to_categorical
 from keras import optimizers
+import matplotlib.pylab as plt
 import scipy.linalg
 from sklearn.cluster import k_means
 from sklearn.cluster import *
@@ -19,7 +20,9 @@ from sklearn import preprocessing
 import csv
 import numpy as np
 import pandas as pd
+from imutils import paths
 import random
+import cv2
 import os
 import copy
 
@@ -156,8 +159,6 @@ conf_mat = np.zeros((num_classes,num_classes))
 '''
 Hardcoding 100-class probabilities for validation images .
 '''
-#class_prob = [14/59,16/59,5/59,14/59,10/59]
-
 class_prob = [1.0/num_classes]*num_classes
 val_prob = np.zeros((num_values,num_classes))
 
@@ -191,6 +192,7 @@ for i in range(num_classes):
 
 
 print(conf_mat)
+plt.imshow(conf_mat)
 
 
 # In[116]:
@@ -200,6 +202,9 @@ dist_mat = 1 - conf_mat
 '''set diagonal elements to 0'''
 dist_mat[range(num_classes),range(num_classes)]=0
 dist_mat = 0.5 * (dist_mat + dist_mat.T)
+plt.figure()
+plt.title('distance matrix on validation set')
+plt.imshow(dist_mat)
 
 
 # In[117]:
@@ -224,6 +229,7 @@ eig_val,eig_vec=scipy.linalg.eig(L,D)
 ftr=eig_vec[:,1:dim+1]
 print(eig_vec[:,0]) # the 1st eigenvector should be all ones
 eigval_cumsum = np.cumsum(np.real(eig_val))
+plt.plot(eigval_cumsum)
 
 
 # In[118]:
@@ -251,15 +257,58 @@ for i in range(n_cluster):
     print (' ')
 print(cluster_members)
 
+''' Adding extra classes to each branch to compensate for coarse misclassification at gating part
+For each branch, sort all classes out of branch based on likelihood that they're misclassified into the branch
+Take the top ones and also limit the total number of classes within each branch
+'''
+
+exp_cluster_members=[None]*n_cluster
+if 1:
+    all_mb=range(num_classes)
+    gamma=3.0
+    score_thres=1.0/(gamma*n_cluster)
+    
+    
+    max_exp_clu_size=(num_classes*2)//3
+    extra_cluster_members=[None]*n_cluster
+
+    for i in range(n_cluster):
+        non_member = np.asarray(np.setdiff1d(range(num_classes),cluster_members[i]))
+    #     print non_member.shape
+        score=np.zeros((non_member.shape[0]))
+        for j in range(non_member.shape[0]):
+            idx=np.nonzero(df['t']==non_member[j])[0]
+            lc_prob=val_prob[idx,:][:,cluster_members[i]]
+            score[j]=np.mean(np.sum(lc_prob,axis=1))
+        score_sorted=np.sort(score)[::-1]
+        idx_sort=np.argsort(score)[::-1]
+        idx2=np.nonzero(score_sorted>=score_thres)[0]
+        if len(idx2)+len(cluster_members[i])> max_exp_clu_size:
+            idx2=idx2[:(max_exp_clu_size-len(cluster_members[i]))]
+        extra_cluster_members[i]=[non_member[idx_sort[id]] for id in idx2]
+        exp_cluster_members[i]=cluster_members[i]+extra_cluster_members[i]
+        assert len(exp_cluster_members[i])==np.unique(np.asarray(exp_cluster_members[i])).shape[0]
+else:
+    '''disjoint coarse category'''
+    for i in range(n_cluster):
+        exp_cluster_members[i]=cluster_members[i]
+        
+total_member=sum([len(cluster) for cluster in exp_cluster_members])
+print('total_member %d' % total_member)
+plt.hist([len(cluster) for cluster in exp_cluster_members],bins=20)
+print(exp_cluster_members)
 
 # In[120]:
 
 
 f2cmap = {}
-for coarse in range(len(cluster_members)):
-    for fine in cluster_members[coarse]:
-        f2cmap[fine] = coarse
-
+for coarse in range(len(exp_cluster_members)):
+    for fine in exp_cluster_members[coarse]:
+        if(fine in f2cmap):
+            f2cmap[fine].append(coarse)
+        else:
+            f2cmap[fine] = list([coarse])
+f2cmap
 
 # In[121]:
 
@@ -426,14 +475,13 @@ for c in range(coarse_categories):
 for key in traindict:
     val = traindict[key]
     c = f2cmap[val]
-
-    os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
-
+    os.system('cp '+ trainsrc+"/"+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
+    
 for key in valdict:
     val = valdict[key]
     c = f2cmap[val]
-
-    os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+    os.system('cp '+ valsrc+"/"+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+        
 
 
 # In[152]:
