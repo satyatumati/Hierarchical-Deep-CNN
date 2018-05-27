@@ -145,7 +145,7 @@ def softmax(ftr):
 
 
 #TODO: automate
-num_values = len(train_datagen.classes)
+num_values = len(train_generator.classes)
 
 conf_mat = np.zeros((num_classes,num_classes))
 
