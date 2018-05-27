@@ -28,7 +28,7 @@ import copy
 
 
 batch_size = 128
-epochs = 50
+epochs = 5
 imsize = 128
 
 # input image dimensions
@@ -157,7 +157,7 @@ conf_mat = np.zeros((num_classes,num_classes))
 Hardcoding 100-class probabilities for validation images .
 '''
 #class_prob = [14/59,16/59,5/59,14/59,10/59]
-class_prob = [1.0/num_classe]*num_classes
+class_prob = [0.1]*num_classes
 val_prob = np.zeros((num_values,num_classes))
 
 for i in range(num_values):
@@ -337,7 +337,7 @@ model.compile(optimizer= sgd_coarse, loss='categorical_crossentropy', metrics=['
 
 index= 0
 step = 5
-stop = 30
+stop = 10
 
 if not os.path.exists("data/models"):
         os.makedirs("data/models")
@@ -425,12 +425,12 @@ for c in range(coarse_categories):
 for key in traindict:
     val = traindict[key]
     c = f2cmap[val]
-    os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
+    os.system('cp '+ trainsrc+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
     
 for key in valdict:
     val = valdict[key]
     c = f2cmap[val]
-    os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+    os.system('cp '+ valsrc+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
         
 
 
@@ -452,9 +452,9 @@ cvalidation_generator = test_datagen.flow_from_directory(
 # In[153]:
 
 
-index = 30
+index = 10
 step = 5
-stop = 50
+stop = 20
 
 while index < stop:
     model_c.fit_generator(ctrain_generator,
@@ -469,7 +469,7 @@ while index < stop:
 
 
 model_c.compile(optimizer=sgd_fine, loss='categorical_crossentropy', metrics=['accuracy'])
-stop = 80
+stop = 30
 
 while index < stop:
     model_c.fit_generator(ctrain_generator,
@@ -557,7 +557,7 @@ for i in range(coarse_categories):
 for cat in range(coarse_categories):
     index= 0
     step = 5
-    stop = 30
+    stop = 10
     
     # Get all training data for the coarse category (not needed as we have generators)
     ix = [i for i,j in f2cmap.items() if j==cat]
@@ -572,7 +572,7 @@ for cat in range(coarse_categories):
         index += step
     
     fine_models['models'][cat].compile(optimizer=sgd_fine, loss='categorical_crossentropy', metrics=['accuracy'])
-    stop = 50
+    stop = 20
 
     while index < stop:
         fine_models['models'][cat].fit_generator(traingenlist[cat],
