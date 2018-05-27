@@ -62,7 +62,7 @@ validation_generator = test_datagen.flow_from_directory(
 # In[ ]:
 
 
-num_classes = len(np.unique(train_datagen.classes))
+num_classes = len(np.unique(train_generator.classes))
 
 
 # In[104]:
@@ -148,7 +148,7 @@ def softmax(ftr):
 
 
 #TODO: automate
-num_values = len(train_datagen.classes)
+num_values = len(train_generator.classes)
 
 conf_mat = np.zeros((num_classes,num_classes))
 
@@ -160,7 +160,7 @@ conf_mat = np.zeros((num_classes,num_classes))
 Hardcoding 100-class probabilities for validation images .
 '''
 #class_prob = [14/59,16/59,5/59,14/59,10/59]
-class_prob = [0.1]*num_classes
+class_prob = [1.0/num_classes]*num_classes
 val_prob = np.zeros((num_values,num_classes))
 
 for i in range(num_values):
@@ -433,12 +433,12 @@ for c in range(coarse_categories):
 for key in traindict:
     val = traindict[key]
     c = f2cmap[val]
-    os.system('cp '+ trainsrc+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
+    os.system('cp '+ trainsrc+"/"+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
     
 for key in valdict:
     val = valdict[key]
     c = f2cmap[val]
-    os.system('cp '+ valsrc+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+    os.system('cp '+ valsrc+"/"+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
         
 
 
