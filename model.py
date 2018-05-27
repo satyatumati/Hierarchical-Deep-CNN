@@ -11,7 +11,6 @@ from keras.models import Model, Sequential
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from keras.utils import to_categorical
 from keras import optimizers
-import matplotlib.pylab as plt
 import scipy.linalg
 from sklearn.cluster import k_means
 from sklearn.cluster import *
@@ -20,9 +19,7 @@ from sklearn import preprocessing
 import csv
 import numpy as np
 import pandas as pd
-from imutils import paths
 import random
-import cv2
 import os
 import copy
 
@@ -62,7 +59,7 @@ validation_generator = test_datagen.flow_from_directory(
 # In[ ]:
 
 
-num_classes = len(np.unique(train_datagen.classes))
+num_classes = len(np.unique(train_generator.classes))
 
 
 # In[104]:
