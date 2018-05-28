@@ -31,6 +31,9 @@ import copy
 batch_size = 128
 epochs = 50
 imsize = 128
+save_weights = False
+load_weights = False
+
 
 # input image dimensions
 img_x, img_y = imsize, imsize
@@ -103,7 +106,7 @@ model.summary()
 # In[52]:
 
 
-if(os.path.isfile(modeldir+"basemodel_wt.h5")):
+if(os.path.isfile(modeldir+"basemodel_wt.h5") and load_weights):
     model.load_weights(modeldir+"basemodel_wt.h5")
 else:
     model.fit_generator(train_generator,
@@ -111,7 +114,8 @@ else:
           verbose=1,
           validation_data=validation_generator,
           )
-    model.save_weights(modeldir+"basemodel_wt.h5")
+    if(save_weights):
+        model.save_weights(modeldir+"basemodel_wt.h5")
 
 
 # In[53]:
@@ -392,7 +396,7 @@ model.compile(optimizer= sgd_coarse, loss='categorical_crossentropy', metrics=['
 # In[71]:
 
 
-if(os.path.isfile(modeldir+"simplemodel_wt.h5")):
+if(os.path.isfile(modeldir+"simplemodel_wt.h5") and load_weights):
     model.load_weights(modeldir+"simplemodel_wt.h5")
 else:
     index= 0
@@ -406,7 +410,8 @@ else:
               validation_data=validation_generator,
               )
         index += step
-    model.save_weights(modeldir+"simplemodel_wt.h5")
+    if(save_weights):
+        model.save_weights(modeldir+"simplemodel_wt.h5")
 
 
 # In[72]:
@@ -506,7 +511,7 @@ cvalidation_generator = test_datagen.flow_from_directory(
 # In[78]:
 
 
-if(os.path.isfile(modeldir+"coarsemodel_wt.h5")):
+if(os.path.isfile(modeldir+"coarsemodel_wt.h5") and load_weights):
     model_c.load_weights(modeldir+"coarsemodel_wt.h5")
 else:
         
@@ -531,7 +536,8 @@ else:
               validation_data = cvalidation_generator
               )
         index += step
-    model_c.save_weights(modeldir+"coarsemodel_wt.h5")
+    if save_weights:
+        model_c.save_weights(modeldir+"coarsemodel_wt.h5")
 
 
 # Variables:
@@ -619,7 +625,7 @@ for cat in range(coarse_categories):
     # Get all training data for the coarse category (not needed as we have generators)
     #ix = [i for i,j in f2cmap.items() if j==cat]
     #print(ix)
-    if(os.path.isfile(modeldir+str(cat)+"finemodel_wt.h5")):
+    if(os.path.isfile(modeldir+str(cat)+"finemodel_wt.h5") and load_weights):
         fine_models['models'][cat].load_weights(modeldir+str(cat)+"finemodel_wt.h5")
 
     else:
@@ -641,7 +647,8 @@ for cat in range(coarse_categories):
               validation_data = valgenlist[cat]
               )
             index += step
-        fine_models['models'][cat].save_weights(modeldir+str(cat)+"finemodel_wt.h5")
+        if save_weights:
+            fine_models['models'][cat].save_weights(modeldir+str(cat)+"finemodel_wt.h5")
     #check: compilation needed??
     
     yh_f = fine_models['models'][cat].predict_generator(valgenlist[cat],steps=30)
