@@ -198,7 +198,7 @@ for i in range(num_classes):
 
 
 print(conf_mat)
-plt.imshow(conf_mat)
+#plt.imshow(conf_mat)
 
 
 # In[61]:
@@ -208,9 +208,9 @@ dist_mat = 1 - conf_mat
 '''set diagonal elements to 0'''
 dist_mat[range(num_classes),range(num_classes)]=0
 dist_mat = 0.5 * (dist_mat + dist_mat.T)
-plt.figure()
-plt.title('distance matrix on validation set')
-plt.imshow(dist_mat)
+#plt.figure()
+#plt.title('distance matrix on validation set')
+#plt.imshow(dist_mat)
 
 
 # In[62]:
@@ -235,7 +235,7 @@ eig_val,eig_vec=scipy.linalg.eig(L,D)
 ftr=eig_vec[:,1:dim+1]
 print(eig_vec[:,0]) # the 1st eigenvector should be all ones
 eigval_cumsum = np.cumsum(np.real(eig_val))
-plt.plot(eigval_cumsum)
+#plt.plot(eigval_cumsum)
 
 
 # In[63]:
@@ -305,7 +305,7 @@ else:
         
 total_member=sum([len(cluster) for cluster in exp_cluster_members])
 print('total_member %d' % total_member)
-plt.hist([len(cluster) for cluster in exp_cluster_members],bins=20)
+#plt.hist([len(cluster) for cluster in exp_cluster_members],bins=20)
 print(exp_cluster_members)
 
 
