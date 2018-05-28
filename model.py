@@ -28,7 +28,7 @@ import copy
 
 
 batch_size = 128
-epochs = 50
+epochs = 1#50
 imsize = 128
 
 # input image dimensions
@@ -338,7 +338,7 @@ model.compile(optimizer= sgd_coarse, loss='categorical_crossentropy', metrics=['
 
 index= 0
 step = 5
-stop = 30
+stop = 5#30
 
 if not os.path.exists("data/models"):
         os.makedirs("data/models")
@@ -454,9 +454,9 @@ cvalidation_generator = test_datagen.flow_from_directory(
 # In[153]:
 
 
-index = 30
+index = 5#30
 step = 5
-stop = 50
+stop = 10#50
 
 while index < stop:
     model_c.fit_generator(ctrain_generator,
@@ -471,7 +471,7 @@ while index < stop:
 
 
 model_c.compile(optimizer=sgd_fine, loss='categorical_crossentropy', metrics=['accuracy'])
-stop = 80
+stop = 15#80
 
 while index < stop:
     model_c.fit_generator(ctrain_generator,
@@ -559,7 +559,7 @@ for i in range(coarse_categories):
 for cat in range(coarse_categories):
     index= 0
     step = 5
-    stop = 30
+    stop = 5#30
     
     # Get all training data for the coarse category (not needed as we have generators)
     ix = [i for i,j in f2cmap.items() if j==cat]
@@ -574,7 +574,7 @@ for cat in range(coarse_categories):
         index += step
     
     fine_models['models'][cat].compile(optimizer=sgd_fine, loss='categorical_crossentropy', metrics=['accuracy'])
-    stop = 50
+    stop = 10#50
 
     while index < stop:
         fine_models['models'][cat].fit_generator(traingenlist[cat],
