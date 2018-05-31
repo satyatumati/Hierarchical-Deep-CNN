@@ -22,6 +22,8 @@ import pandas as pd
 import random
 import os
 import copy
+from sklearn.metrics import accuracy_score
+
 
 
 # In[102]:
@@ -516,19 +518,6 @@ for i in range(coarse_categories):
     fine_models['models'][i] = model_i
 
 
-# In[163]:
-
-
-def get_error(y,yh):
-    # Threshold 
-    yht = np.zeros(np.shape(yh))
-    #here, 1 denotes axis=column
-    yht[np.arange(len(yh)), yh.argmax(1)] = 1
-    # Evaluate Error
-    error = np.count_nonzero(np.count_nonzero(y-yht,1))/len(y)
-    return error
-
-
 # In[164]:
 
 
@@ -582,18 +571,13 @@ for cat in range(coarse_categories):
           )
         index += step
         
-    #check: compilation needed??
     
-    yh_f = fine_models['models'][cat].predict_generator(valgenlist[cat],steps=30)
-    print('Fine Classifier '+str(cat)+' Error: ')
-    #str(get_error(y_val[ix_v],yh_f)))
-    
-
-
 # In[193]:
 
 
-#yh_f
+def get_error(t,p):
+    #TODO add confidence score
+    return accuracy_score(t,p)
 
 
 # In[190]:
@@ -603,14 +587,13 @@ for cat in range(coarse_categories):
 #predictions from coarse classifier
 #coarse_predictions dim: n_images_predict X n_classes_coarse
 
-coarse_predictions=model_c.predict_generator(validation_generator,steps=30)
-#coarse_predictions=model_c.predict(img)
+coarse_predictions=model_c.predict_generator(validation_generator)
+
 #predictions from #(coarse categories) fine classifiers
 fine_predictions = [] #dim:  n_classes_coarse X n_images_predict X n_classes_fine
 for c in range(coarse_categories):
-    fine_predictions.append(fine_models['models'][c].predict_generator(validation_generator,steps=30))
-    #fine_predictions.append(fine_models['models'][c].predict(img))
-
+    fine_predictions.append(fine_models['models'][c].predict_generator(validation_generator))
+    
 
 # In[184]:
 
@@ -637,3 +620,5 @@ for img in range(prediction_size):
     predicted = np.argmax(proba)
     predictions.append(predicted)
 
+truelabels = validation_generator.classes
+get_error(truelabels,predictions)
