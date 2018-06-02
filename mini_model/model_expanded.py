@@ -32,9 +32,10 @@ from sklearn.metrics import accuracy_score
 batch_size = 128
 epochs = 50
 imsize = 128
-save_weights = False
+save_weights = True
 load_weights = False
-
+if save_weights:
+    print("Saving Weights")
 
 # input image dimensions
 img_x, img_y = imsize, imsize
@@ -42,9 +43,9 @@ input_shape = (img_x, img_y,3)
 print(input_shape)
 
 
-if not os.path.exists("data/models/"):
-        os.makedirs("data/models/")
-modeldir = "data/models/"
+if not os.path.exists("data/models_100_200/"):
+        os.makedirs("data/models_100_200/")
+modeldir = "data/models_100_200/"
 
 
 # In[46]:
@@ -52,8 +53,8 @@ modeldir = "data/models/"
 
 #ImageDataGenerator to generate batches of images
 #add: zca_whitening = True,
-train_datagen = ImageDataGenerator(rescale=1./255)
-test_datagen = ImageDataGenerator(rescale=1./255)
+train_datagen = ImageDataGenerator(rescale=1./255, zca_whitening=True)
+test_datagen = ImageDataGenerator(rescale=1./255, zca_whitening=True)
 train_generator = train_datagen.flow_from_directory(
         'data/train',
         target_size=(imsize, imsize),
@@ -83,14 +84,30 @@ train_generator.class_indices
 
 model = Sequential()
 
-model.add(Conv2D(32, kernel_size=(5, 5), strides=(1, 1),
-                 activation='relu',
-                 input_shape=input_shape))
+model.add(Conv2D(184, kernel_size=(3, 3), strides=(1, 1), activation='elu', input_shape=input_shape))
 model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-model.add(Conv2D(64, (5, 5), activation='relu'))
+model.add(Conv2D(184, kernel_size=(1, 1), activation='elu'))
+model.add(Conv2D(184, kernel_size=(2, 2), activation='elu'))
+model.add(Conv2D(284, kernel_size=(2, 2), activation='elu'))
+model.add(Conv2D(284, kernel_size=(2, 2), activation='elu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(284, kernel_size=(1, 1), activation='elu'))
+model.add(Conv2D(440, kernel_size=(2, 2), activation='elu'))
+model.add(Conv2D(440, kernel_size=(2, 2), activation='elu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(440, kernel_size=(3, 3), activation='elu'))
+model.add(Conv2D(568, kernel_size=(2, 2), activation='elu'))
+model.add(Conv2D(568, kernel_size=(2, 2), activation='elu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(568, kernel_size=(1, 1), activation='elu'))
+model.add(Conv2D(606, kernel_size=(2, 2), activation='elu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
 model.add(Flatten())
-model.add(Dense(100, activation='relu'))
+model.add(Dense(606, activation='elu'))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
@@ -481,6 +498,8 @@ for c in range(coarse_categories):
         if not os.path.exists(valdest+"/"+str(c)+"/"+key):
             os.makedirs(valdest+"/"+str(c)+"/"+key)
 
+print("Copying")
+
 for key in traindict:
     val = traindict[key]
     catlist = f2cmap[val]
@@ -493,6 +512,7 @@ for key in valdict:
 	for val in catlist:
 		os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(val)+"/"+key)
 
+print("Copying done")
 
 # In[77]:
 
@@ -609,7 +629,7 @@ for cat in range(coarse_categories):
     index= 0
     step = 5
     stop = 30
-    
+    print("Number of coarse categories",coarse_categories) 
     # Get all training data for the coarse category (not needed as we have generators)
     #ix = [i for i,j in f2cmap.items() if j==cat]
     #print(ix)
@@ -626,7 +646,7 @@ for cat in range(coarse_categories):
             index += step
 
         fine_models['models'][cat].compile(optimizer=sgd_fine, loss='categorical_crossentropy', metrics=['accuracy'])
-        stop = 50
+        stop = 60
 
         while index < stop:
             fine_models['models'][cat].fit_generator(traingenlist[cat],
@@ -644,7 +664,7 @@ for cat in range(coarse_categories):
 # In[84]:
 
 
-def get_error(t,p):
+def get_accuracy(t,p):
     #TODO add confidence score
     return accuracy_score(t,p)
 
@@ -665,14 +685,15 @@ for c in range(coarse_categories):
 
 # In[44]:
 
-
-coarse_predictions
+print("Coarse_predictions")
+print(coarse_predictions)
 
 
 # In[45]:
 
 
-fine_predictions
+print("Fine_predictions")
+print(fine_predictions)
 
 
 # In[47]:
@@ -692,8 +713,4 @@ for img in range(prediction_size):
 # In[1]:
 
 
-predictions
-
-truelabels = validation_generator.classes
-
-get_error(truelabels,predictions)
+print(predictions)
