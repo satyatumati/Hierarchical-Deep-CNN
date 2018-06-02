@@ -503,14 +503,14 @@ print("Copying")
 for key in traindict:
     val = traindict[key]
     catlist = f2cmap[val]
-	for val in catlist:
-		os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(val)+"/"+key)
+    for val in catlist:
+        os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(val)+"/"+key)
 
 for key in valdict:
     val = valdict[key]
     catlist = f2cmap[val]
-	for val in catlist:
-		os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(val)+"/"+key)
+    for val in catlist:
+        os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(val)+"/"+key)
 
 print("Copying done")
 
