@@ -483,15 +483,15 @@ for c in range(coarse_categories):
 
 for key in traindict:
     val = traindict[key]
-    c = f2cmap[val]
-
-    os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(c)+"/"+key)
+    catlist = f2cmap[val]
+	for val in catlist:
+		os.system('cp '+ trainsrc+'/'+key +"/* "+ traindest+"/"+ str(val)+"/"+key)
 
 for key in valdict:
     val = valdict[key]
-    c = f2cmap[val]
-
-    os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(c)+"/"+key)
+    catlist = f2cmap[val]
+	for val in catlist:
+		os.system('cp '+ valsrc+'/'+key +"/* "+ valdest+"/"+ str(val)+"/"+key)
 
 
 # In[77]:
