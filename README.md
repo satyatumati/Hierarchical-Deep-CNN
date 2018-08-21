@@ -1,6 +1,5 @@
-# Google-Landmark-Recognition
+# Hierarchical Deep CNN 
 
-Many a times, it happens that we might forget name of the monument, we once visited. In such cases, a technology to classify the images can be of great help. It can facilitate prediction of landmark labels directly from the raw image pixels. An additional advantage is that people will be able to organize their photos in a better and organized manner. In future, this can also be applied to travel guide recommendation applications as well as for geolocation visualization.
 
 In this project, we tried to solve the Landmark Recognition Challenge by Google hosted on Kaggle. The idea is to build a model that recognizes the correct landmark in a dataset of challenging test images. A major challenge for this application is to obtain a large annotated dataset. It is extremely difficult to add annotations manually for all images. So, to build the model, we utilize the annotated data provided by them. This data has been constructed by clustering visually similar photos and matching them based on local features.
 
